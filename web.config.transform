@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<configuration xmlns:xdt="http://schemas.microsoft.com/XML-Document-Transform">
+	<system.webServer>
+		<modules>
+			<add xdt:Transform="InsertBefore(/configuration/system.webServer/modules/add)" name="CacheableMediaModule" type="CacheableMediaRequest.CacheableMediaModule, CacheableMediaRequest" />
+		</modules>
+		<handlers>
+			<add xdt:Locator="Match(name)" name="Sitecore.MediaRequestHandler" xdt:Transform="SetAttributes" type="CacheableMediaRequest.CacheableMediaRequestHandler, CacheableMediaRequest" />
+		</handlers>
+	</system.webServer>
+</configuration>
