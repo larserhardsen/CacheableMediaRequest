@@ -27,6 +27,7 @@ namespace CacheableMediaRequest
             if (context.Request.QueryString["killCache"] != null)
             {
                 context.Cache.Remove(key);
+                return;
             }
             
             CacheableMedia media = (CacheableMedia)context.Cache[key];

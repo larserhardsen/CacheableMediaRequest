@@ -11,11 +11,22 @@ namespace CacheableMediaRequest
     /// </summary>
     public class ResponseFilterStream : Stream
     {
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                this.cacheStream?.Dispose();
+                this.stream?.Dispose();
+            }
+
+            base.Dispose(disposing);
+        }
+
         /// <summary>
         ///     Stream that original content is read into
         ///     and then passed to TransformStream function
         /// </summary>
-        private MemoryStream cacheStream = new MemoryStream(5000);
+        private MemoryStream cacheStream = new MemoryStream();
 
         /// <summary>
         ///     The original stream

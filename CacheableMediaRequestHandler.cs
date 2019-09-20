@@ -8,6 +8,8 @@ namespace CacheableMediaRequest
 {
     public class CacheableMediaRequestHandler : Sitecore.Resources.Media.MediaRequestHandler
     {
+        private static readonly object cacheLock = new object();
+
         public override void ProcessRequest(HttpContext context)
         {
             base.ProcessRequest(context);
@@ -24,18 +26,18 @@ namespace CacheableMediaRequest
             }
 
             MediaRequestTrackingInformation info = new MediaRequestTrackingInformation(this.GetMediaRequest(context.Request));
-            if (!info.IsTrackedRequest())
+            if (info.IsTrackedRequest())
             {
                 return;
             }
-                
+
             ResponseFilterStream filter = new ResponseFilterStream(context.Response.Filter);
-            filter.TransformStream += stream => this.CachingFilter(stream, context, key);
+            filter.TransformStream += stream => CachingFilter(stream, context, key);
 
             context.Response.Filter = filter;
         }
 
-        private MemoryStream CachingFilter(MemoryStream ms, HttpContext context, string key)
+        private static MemoryStream CachingFilter(MemoryStream ms, HttpContext context, string key)
         {
             byte[] buffer = ms.GetBuffer();
 
@@ -44,17 +46,20 @@ namespace CacheableMediaRequest
                 return ms;
             }
 
-            context.Cache.Insert(key, new CacheableMedia
+            lock (cacheLock)
             {
-                Cache = context.Response.Cache,
-                Output = buffer,
-                Headers = context.Response.Headers,
-                StatusCode = context.Response.StatusCode,
-                ContentType = context.Response.ContentType,
-                ContentEncoding = context.Response.ContentEncoding,
-                HeaderEncoding = context.Response.HeaderEncoding,
-                Charset = context.Response.Charset,
-            }, null, Cache.NoAbsoluteExpiration, TimeSpan.FromMinutes(10));
+                context.Cache.Insert(key, new CacheableMedia
+                {
+                    Cache = context.Response.Cache,
+                    Output = buffer,
+                    Headers = context.Response.Headers,
+                    StatusCode = context.Response.StatusCode,
+                    ContentType = context.Response.ContentType,
+                    ContentEncoding = context.Response.ContentEncoding,
+                    HeaderEncoding = context.Response.HeaderEncoding,
+                    Charset = context.Response.Charset,
+                }, null, Cache.NoAbsoluteExpiration, TimeSpan.FromMinutes(10));
+            }
 
             return ms;
         }
