@@ -5,3 +5,4 @@
 /.vs/CacheableMediaRequest/v16
 /bin/Debug
 /obj
+*.user

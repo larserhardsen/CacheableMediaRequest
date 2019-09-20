@@ -1,4 +1,5 @@
 ﻿using System.Collections.Specialized;
+using System.Text;
 using System.Web;
 
 namespace CacheableMediaRequest
@@ -10,5 +11,8 @@ namespace CacheableMediaRequest
         public HttpCachePolicy Cache { get; set; }
         public NameValueCollection Headers { get; set; }
         public string ContentType { get; set; }
+        public Encoding ContentEncoding { get; set; }
+        public Encoding HeaderEncoding { get; set; }
+        public string Charset { get; set; }
     }
 }

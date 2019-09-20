@@ -50,7 +50,10 @@ namespace CacheableMediaRequest
                 Output = buffer,
                 Headers = context.Response.Headers,
                 StatusCode = context.Response.StatusCode,
-                ContentType = context.Response.ContentType
+                ContentType = context.Response.ContentType,
+                ContentEncoding = context.Response.ContentEncoding,
+                HeaderEncoding = context.Response.HeaderEncoding,
+                Charset = context.Response.Charset,
             }, null, Cache.NoAbsoluteExpiration, TimeSpan.FromMinutes(10));
 
             return ms;

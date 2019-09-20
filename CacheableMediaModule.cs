@@ -53,7 +53,9 @@ namespace CacheableMediaRequest
             response.OutputStream.Write(media.Output, 0, media.Output.Length);
             response.ContentType = media.ContentType;
             response.StatusCode = media.StatusCode;
-
+            response.ContentEncoding = media.ContentEncoding;
+            response.HeaderEncoding = media.HeaderEncoding;
+            response.Charset = media.Charset;
             response.Cache.SetLastModified(media.Cache.GetUtcLastModified());
             response.Cache.SetCacheability(media.Cache.GetCacheability());
             response.Cache.SetMaxAge(media.Cache.GetMaxAge());
