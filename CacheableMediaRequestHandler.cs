@@ -39,7 +39,7 @@ namespace CacheableMediaRequest
 
         private static MemoryStream CachingFilter(MemoryStream ms, HttpContext context, string key)
         {
-            byte[] buffer = ms.GetBuffer();
+            byte[] buffer = ms.ToArray();
 
             if (buffer.LongLength > 2000000)
             {
@@ -58,6 +58,7 @@ namespace CacheableMediaRequest
                     ContentEncoding = context.Response.ContentEncoding,
                     HeaderEncoding = context.Response.HeaderEncoding,
                     Charset = context.Response.Charset,
+                    ContentLength = buffer.Length,
                 }, null, Cache.NoAbsoluteExpiration, TimeSpan.FromMinutes(10));
             }
 

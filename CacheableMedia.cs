@@ -14,5 +14,6 @@ namespace CacheableMediaRequest
         public Encoding ContentEncoding { get; set; }
         public Encoding HeaderEncoding { get; set; }
         public string Charset { get; set; }
+        public int ContentLength { get; set; }
     }
 }

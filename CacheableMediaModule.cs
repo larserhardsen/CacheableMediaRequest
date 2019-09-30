@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Web;
 
 namespace CacheableMediaRequest
@@ -17,8 +18,13 @@ namespace CacheableMediaRequest
         private static void OnBeginRequest(object sender, EventArgs e)
         {
             HttpContext context = ((HttpApplication)sender).Context;
-         
             string key = context.Request.Url.OriginalString;
+
+            if (!key.ToLowerInvariant().Contains("-/media/") && !key.ToLowerInvariant().Contains("~/media/"))
+            {
+                return;
+            }
+
             if (context.Cache[key] == null)
             {
                 return;
@@ -29,7 +35,7 @@ namespace CacheableMediaRequest
                 context.Cache.Remove(key);
                 return;
             }
-            
+
             CacheableMedia media = (CacheableMedia)context.Cache[key];
             WriteResponse(context, media);
         }
@@ -38,12 +44,9 @@ namespace CacheableMediaRequest
         {
             HttpResponse response = context.Response;
 
-            foreach (string headerKey in media.Headers.AllKeys)
+            foreach (string headerKey in media.Headers.AllKeys.Where(key => media.Headers[key] != null))
             {
-                if (response.Headers[headerKey] != null)
-                {
-                    response.Headers[headerKey] = media.Headers[headerKey];
-                }
+                response.Headers[headerKey] = media.Headers[headerKey];
             }
 
             if (context.IsDebuggingEnabled)
@@ -51,7 +54,7 @@ namespace CacheableMediaRequest
                 response.Headers.Add("X-EvilCache", "True");
             }
 
-            response.OutputStream.Write(media.Output, 0, media.Output.Length);
+            response.OutputStream.Write(media.Output, 0, media.ContentLength);
             response.ContentType = media.ContentType;
             response.StatusCode = media.StatusCode;
             response.ContentEncoding = media.ContentEncoding;
